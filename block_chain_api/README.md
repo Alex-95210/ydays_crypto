@@ -19,4 +19,4 @@ uvicorn main:app --reload
 
 ## API doc
 
-[click me](https://localhost:8000/docs) to see the API documentation
+https://localhost:8000/docs to see the API documentation
