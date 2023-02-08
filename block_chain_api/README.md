@@ -2,7 +2,7 @@
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to run the API.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the following packages that you will need to run the API.
 
 ```bash
 pip install uvicorn
