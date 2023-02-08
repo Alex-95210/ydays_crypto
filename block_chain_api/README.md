@@ -19,4 +19,4 @@ uvicorn main:app --reload
 
 ## API doc
 
-[click me](https://pip.pypa.io/en/stable/) to see the API documentation
+[click me](https://localhost:8000/docs) to see the API documentation
