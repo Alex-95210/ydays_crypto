@@ -1,2 +1,2 @@
-_pycache_/
+__pycache__/
 block_chain_api/blockchain_db.json
