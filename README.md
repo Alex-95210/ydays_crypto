@@ -30,3 +30,9 @@ une block chain de verification d'authenticité des casques de moto
 - ajout d'une route de verification de l'intéritée de la chaine
 - ajout d'une route de récupération du dernier block créé
 - ajout d'une route de récuperation de la chaine
+
+## jour 4
+- j'ai passé ma journée à faire fonctionner la block chain sur mariaDB au final pas utilisé car centralisé
+
+## jour 5
+- mise en place d'un gossip protocole 
