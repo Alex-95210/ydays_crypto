@@ -15,7 +15,7 @@ class GossipNode:
         self.previous_message = ''
 
         # set the address, i.e(hostname and port) of the socket
-        self.hostname = socket.gethostname()
+        self.hostname = "127.0.0.1"
         self.port = port
 
         # bind the address to the socket created
