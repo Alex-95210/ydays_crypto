@@ -43,13 +43,48 @@ async def last_block():
     print(message)
     return message
 
-@app.post("/mine")
-async def mine_block(data):
-    message = bc.mine(data=data)
+@app.post("/b2c")
+async def buyer_to_customer(numSerie, model, color, brandHash, buyerHash):
+    token = bc.createToken(numSerie,model,color)
+    transaction = bc.createTransaction(token, brandHash, buyerHash)
+    message = bc.mine(data=transaction)
     if message == 2:
-        raise HTTPException(status_code=400, detail=data,headers={"X-Error": "block chain invalid"})
+        raise HTTPException(status_code=400, detail=message,headers={"X-Error": "block chain invalid"})
     else :
         raise HTTPException(status_code=201, detail=message)
+    
+@app.put("/c2c")
+async def customer_to_customer(token, ownerHash, buyerHash):
+    transaction = bc.createTransaction(token, ownerHash, buyerHash)
+    message = bc.mine(data=transaction)
+    if message == 2:
+        raise HTTPException(status_code=400, detail=message,headers={"X-Error": "block chain invalid"})
+    else :
+        raise HTTPException(status_code=204, detail=message)
+    
+@app.get("/owner")
+async def get_current_owner(token):
+    res = bc.findOwner(token)
+    if res == 2:
+        raise HTTPException(status_code=400, detail=res,headers={"X-Error": "token invalid"})
+    else :
+        raise HTTPException(status_code=200, detail=res)
+
+@app.get("/fisrtSellDate")
+async def get_fisrt_sell_date(token):
+    res = bc.getFirstSellDate(token)
+    if res == 2:
+        raise HTTPException(status_code=400, detail=res,headers={"X-Error": "token invalid"})
+    else :
+        raise HTTPException(status_code=200, detail=res)
+
+@app.get("/tokenInfos")
+async def get_token_infos(token):
+    res = bc.getTokenInfos(token)
+    if res == 2:
+        raise HTTPException(status_code=400, detail=res,headers={"X-Error": "token invalid"})
+    else :
+        raise HTTPException(status_code=200, detail=res)
     
 @app.get("/integrity")
 async def check_chain_integrity():

@@ -122,22 +122,26 @@ class Blockchain:
             block_index += 1
 
         return True
-    
-    def createToken(numSerie: str, model: str, color: str):
+    #
+    def createToken(self,numSerie: str, model: str, color: str):
         token = str(numSerie + model + color)
-        tokenHashed = hashlib.sha256(token)
+        tokenHashed = hashlib.sha256(token.encode('utf-8')).hexdigest()
+        print("token in f = ")
+        print(tokenHashed)
         return tokenHashed
 
-    def createTransaction(token: str, previousOwner: str, newOwner: str):
-        transaction = str(token+","+previousOwner+","+newOwner)
+    def createTransaction(self,token: str, previousOwner: str, newOwner: str):
+        transaction = str(str(token)+","+previousOwner+","+newOwner)
         return transaction
     
     def findOwner(self, token: str):
         chain = self.get_db()
-        block_index = len(chain)
+        block_index = len(chain) -1
 
-        while block_index > len(chain):
+        while block_index > 0:
             block = chain[block_index]
+            block_index -= 1
+            print(block["data"].split(',')[0])
             if block["data"].split(',')[0] == token :
                 return block["data"].split(',')[2]
     
@@ -147,10 +151,9 @@ class Blockchain:
         chain = self.get_db()
         block_index = 1
 
-        while block_index < len(chain):
+        while block_index < len(chain)-1:
             block = chain[block_index]
             if block["data"].split(',')[0] == token :
                 return block["timestamp"]
     
         return "the token doesn't exist"
-
