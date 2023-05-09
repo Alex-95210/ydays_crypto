@@ -1,5 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from p2p.gossipNode import GossipNode
+from fastapi import FastAPI, HTTPException, WebSocket
 import blockchain as blockchainClass
+
+from typing import List
 
 bc = blockchainClass.Blockchain()
 
@@ -23,6 +26,29 @@ app = FastAPI(
         "name": "HellChain API"
     }
 )
+class SocketManager:
+    def __init__(self):
+        self.active_connections: List[(WebSocket, str)] = []
+
+    async def connect(self, websocket: WebSocket, user: str):
+        await websocket.accept()
+        self.active_connections.append((websocket, user))
+
+    def disconnect(self, websocket: WebSocket, user: str):
+        self.active_connections.remove((websocket, user))
+
+    async def broadcast(self, data):
+        for connection in self.active_connections:
+            await connection[0].send_json(data)    
+
+manager = SocketManager()
+
+
+@app.websocket("/ws")
+async def start_block_chain():
+    connected_nodes = [5001,5002]
+    node = GossipNode(5000, connected_nodes)
+    return node
 
 @app.get("/")
 async def full_chain():
@@ -44,7 +70,7 @@ async def last_block():
     return message
 
 @app.post("/b2c")
-async def buyer_to_customer(numSerie, model, color, brandHash, buyerHash):
+async def business_to_customer(numSerie, model, color, brandHash, buyerHash):
     token = bc.createToken(numSerie,model,color)
     transaction = bc.createTransaction(token, brandHash, buyerHash)
     message = bc.mine(data=transaction)
@@ -66,23 +92,22 @@ async def customer_to_customer(token, ownerHash, buyerHash):
 async def get_current_owner(token):
     res = bc.findOwner(token)
     if res == 2:
-        raise HTTPException(status_code=400, detail=res,headers={"X-Error": "token invalid"})
+        raise HTTPException(status_code=400, detail="token invalid",headers={"X-Error": "token invalid"})
     else :
         raise HTTPException(status_code=200, detail=res)
+@app.get("/helmetAuth")
+async def check_helmet_authenticity(serieNum, model, color):
+    res = bc.checkHelmetAuthenticity(serieNum, model, color)
+    if res == 2:
+        raise HTTPException(status_code=400, detail="helmet not authentic",headers={"X-Error": "helmet not authentic"})
+    else :
+        raise HTTPException(status_code=200, detail="the helmet is authentic and it's token is: "+res)
 
 @app.get("/fisrtSellDate")
 async def get_fisrt_sell_date(token):
     res = bc.getFirstSellDate(token)
     if res == 2:
-        raise HTTPException(status_code=400, detail=res,headers={"X-Error": "token invalid"})
-    else :
-        raise HTTPException(status_code=200, detail=res)
-
-@app.get("/tokenInfos")
-async def get_token_infos(token):
-    res = bc.getTokenInfos(token)
-    if res == 2:
-        raise HTTPException(status_code=400, detail=res,headers={"X-Error": "token invalid"})
+        raise HTTPException(status_code=400, detail="token invalid",headers={"X-Error": "token invalid"})
     else :
         raise HTTPException(status_code=200, detail=res)
     
